@@ -1,19 +1,24 @@
 package com.example.movietheater.controller;
 
+import com.example.movietheater.MovieTheaterApplication;
 import com.example.movietheater.model.User;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class DashboardController extends ControllerBase {
+public class DashboardController extends BaseController {
     @FXML
     private Label welcomeLabel;
 
-    @FXML Label roleLabel;
+    @FXML
+    private Label roleLabel;
 
-    @FXML Label datetimeLabel;
+    @FXML
+    private Label datetimeLabel;
 
     private User user;
 
@@ -32,5 +37,17 @@ public class DashboardController extends ControllerBase {
         String formattedTime = now.format(timeFormatter);
 
         datetimeLabel.setText("The current date and time is: " + formattedDate + " " + formattedTime);
+    }
+
+    public void handleTicketSales(ActionEvent event) throws IOException {
+        MovieTheaterApplication.getSceneController().changeScene("TicketSales", user);
+    }
+
+    public void handleShowingsManagement(ActionEvent event) throws IOException {
+        MovieTheaterApplication.getSceneController().changeScene("ManageShowings", user);
+    }
+
+    public void handleSalesHistory(ActionEvent event) throws IOException {
+        MovieTheaterApplication.getSceneController().changeScene("SalesHistory", user);
     }
 }

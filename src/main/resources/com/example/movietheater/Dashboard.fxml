@@ -15,9 +15,9 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <Button fx:id="ticketNavItem" layoutX="259.0" layoutY="44.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="74.0" style="-fx-background-color: #808080; -fx-background-radius: 0;" text="Sell tickets" textFill="#f2f2f2" />
-            <Button fx:id="showingsNavItem" layoutX="335.0" layoutY="44.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="115.0" style="-fx-background-color: #808080; -fx-background-radius: 0;" text="Manage showings" textFill="#f2f2f2" />
-            <Button fx:id="salesNavItem" layoutX="452.0" layoutY="44.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="111.0" style="-fx-background-color: #808080; -fx-background-radius: 0;" text="View sales history" textFill="#f2f2f2" />
+            <Button fx:id="ticketNavItem" layoutX="259.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleTicketSales" prefHeight="31.0" prefWidth="74.0" style="-fx-background-color: #808080; -fx-background-radius: 0;" text="Sell tickets" textFill="#f2f2f2" />
+            <Button fx:id="showingsNavItem" layoutX="335.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleShowingsManagement" prefHeight="31.0" prefWidth="115.0" style="-fx-background-color: #808080; -fx-background-radius: 0;" text="Manage showings" textFill="#f2f2f2" />
+            <Button fx:id="salesNavItem" layoutX="452.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleSalesHistory" prefHeight="31.0" prefWidth="111.0" style="-fx-background-color: #808080; -fx-background-radius: 0;" text="View sales history" textFill="#f2f2f2" />
          </children></AnchorPane>
    </top>
    <center>

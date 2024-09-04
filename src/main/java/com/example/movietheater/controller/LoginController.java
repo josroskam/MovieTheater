@@ -3,16 +3,16 @@ package com.example.movietheater.controller;
 import com.example.movietheater.MovieTheaterApplication;
 import com.example.movietheater.database.InMemoryDatabase;
 import com.example.movietheater.model.User;
+import com.example.movietheater.service.UserService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
 
-public class LoginController extends ControllerBase {
+public class LoginController extends BaseController {
 
     @FXML
     private Label loginResponseLabel;

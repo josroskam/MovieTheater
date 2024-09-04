@@ -14,9 +14,13 @@ public class SceneController {
     }
 
     public void changeScene(String component, Object data) throws IOException {
+        System.out.println();
+        System.out.println(getClass().getResource("/com/example/movietheater/" + component + ".fxml"));
+        System.out.println();
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/movietheater/" + component + ".fxml"));
         Scene scene = new Scene(loader.load());
-        ControllerBase controller = loader.getController();
+        BaseController controller = loader.getController();
         controller.initData(data);
         stage.setTitle(component);
         stage.setScene(scene);
