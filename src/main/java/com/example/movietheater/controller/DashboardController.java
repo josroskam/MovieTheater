@@ -1,6 +1,7 @@
 package com.example.movietheater.controller;
 
 import com.example.movietheater.MovieTheaterApplication;
+import com.example.movietheater.model.Context;
 import com.example.movietheater.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -24,7 +25,10 @@ public class DashboardController extends BaseController {
 
     @Override
     public void initData(Object data) {
-        this.user = (User) data;
+// Cast data to the correct type: Context
+        Context context = (Context) data;
+        this.user = context.getUser();
+
         welcomeLabel.setText("Welcome " + user.getFullName());
         roleLabel.setText("You are logged in as: " + user.getRole().toString());
 
@@ -40,14 +44,14 @@ public class DashboardController extends BaseController {
     }
 
     public void handleTicketSales(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("TicketSales", user);
+        MovieTheaterApplication.getSceneController().changeScene("TicketSales", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
     }
 
     public void handleShowingsManagement(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("ManageShowings", user);
+        MovieTheaterApplication.getSceneController().changeScene("ManageShowings", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
     }
 
     public void handleSalesHistory(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("SalesHistory", user);
+        MovieTheaterApplication.getSceneController().changeScene("SalesHistory", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
     }
 }

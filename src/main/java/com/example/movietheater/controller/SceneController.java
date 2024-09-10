@@ -1,5 +1,6 @@
 package com.example.movietheater.controller;
 
+import com.example.movietheater.model.Context;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -13,15 +14,13 @@ public class SceneController {
         this.stage = stage;
     }
 
-    public void changeScene(String component, Object data) throws IOException {
-        System.out.println();
-        System.out.println(getClass().getResource("/com/example/movietheater/" + component + ".fxml"));
-        System.out.println();
-
+    public void changeScene(String component, Context context) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/movietheater/" + component + ".fxml"));
         Scene scene = new Scene(loader.load());
+
         BaseController controller = loader.getController();
-        controller.initData(data);
+        controller.initData(context);
+
         stage.setTitle(component);
         stage.setScene(scene);
         stage.show();
