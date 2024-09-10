@@ -18,6 +18,8 @@ public class UserDatabase {
     }
 
     public User getUserByUsername(String username) {
+        System.out.println(username);
+        System.out.println(users.get(username));
         return users.get(username);
     }
 }

@@ -2,6 +2,8 @@ package com.example.movietheater.controller;
 
 import com.example.movietheater.MovieTheaterApplication;
 import com.example.movietheater.database.InMemoryDatabase;
+import com.example.movietheater.database.MovieDatabase;
+import com.example.movietheater.model.Context;
 import com.example.movietheater.model.User;
 import com.example.movietheater.service.UserService;
 import javafx.event.ActionEvent;
@@ -23,15 +25,16 @@ public class LoginController extends BaseController {
     @FXML
     private PasswordField passwordTextField;
 
-    private InMemoryDatabase database;
-
-    public LoginController() {
-        this.database = new InMemoryDatabase();
-    }
+    private UserService userService;
+    private MovieDatabase movieDatabase; // Now we will use the shared InMemoryDatabase
+    private InMemoryDatabase inMemoryDatabase;
 
     @Override
     public void initData(Object data) {
-        // No initialization data required for login
+        Context context = (Context) data;
+        this.inMemoryDatabase = context.getInMemoryDatabase();
+        this.userService = new UserService(inMemoryDatabase); // Use shared database for user validation
+        this.movieDatabase = context.getInMemoryDatabase().getMovieDatabase();
     }
 
     @FXML
@@ -39,11 +42,12 @@ public class LoginController extends BaseController {
         String username = usernameTextField.getText();
         String password = passwordTextField.getText();
 
-        User user = database.getUserDatabase().getUserByUsername(username);
+        User user = userService.validateUser(username, password);
 
-        if (user != null && user.getPassword().equals(password)) {
+        if (user != null) {
             loginResponseLabel.setText("Login successful");
-            MovieTheaterApplication.getSceneController().changeScene("Dashboard", user);
+            // Pass the user and the shared InMemoryDatabase when navigating to the Dashboard
+            MovieTheaterApplication.getSceneController().changeScene("Dashboard", new Context(user, null, inMemoryDatabase));
         } else {
             loginResponseLabel.setText("Wrong username or password");
         }
