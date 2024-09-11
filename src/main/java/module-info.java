@@ -5,6 +5,7 @@ module com.example.movietheater {
     requires javafx.controls;
     requires javafx.fxml;
     requires jdk.compiler;
+    requires java.desktop;
 
     opens com.example.movietheater.model to javafx.base;
 
