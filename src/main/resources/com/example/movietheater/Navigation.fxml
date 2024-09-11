@@ -6,9 +6,21 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.movietheater.Navigation"
-            prefHeight="400.0" prefWidth="600.0">
 
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.movietheater.controller.NavigationController" prefHeight="76.0" prefWidth="600.0" style="-fx-background-color: #171717;">
+    <children>
+        <Label layoutX="22.0" layoutY="27.0" text="Fantastic Cinema" textFill="#f2f2f2">
+            <font>
+                <Font name="System Bold" size="24.0" />
+            </font>
+        </Label>
+        <Button fx:id="ticketNavItem" layoutX="259.0" layoutY="44.0" onAction="#handleTicketSales" prefHeight="31.0" prefWidth="74.0" style="-fx-background-color: #808080;" text="Sell tickets" textFill="#f2f2f2" />
+        <Button fx:id="showingsNavItem" layoutX="335.0" layoutY="44.0" onAction="#handleShowingsManagement" prefHeight="31.0" prefWidth="115.0" style="-fx-background-color: #808080;" text="Manage showings" textFill="#f2f2f2" />
+        <Button fx:id="salesNavItem" layoutX="452.0" layoutY="44.0" onAction="#handleSalesHistory" prefHeight="31.0" prefWidth="111.0" style="-fx-background-color: #808080;" text="View sales history" textFill="#f2f2f2" />
+    </children>
 </AnchorPane>
+
+

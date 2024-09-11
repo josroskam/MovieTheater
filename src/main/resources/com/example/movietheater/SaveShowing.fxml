@@ -10,18 +10,7 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.movietheater.controller.SaveShowingController">
     <top>
-        <AnchorPane prefHeight="76.0" prefWidth="600.0" style="-fx-background-color: #171717;" BorderPane.alignment="CENTER">
-            <children>
-                <Label fx:id="" layoutX="22.0" layoutY="27.0" text="Fantastic Cinema" textFill="#f2f2f2">
-                    <font>
-                        <Font name="System Bold" size="24.0" />
-                    </font>
-                </Label>
-                <Button fx:id="ticketNavItem" layoutX="259.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleTicketSales" prefHeight="31.0" prefWidth="74.0" style="-fx-background-color: #808080; -fx-background-radius: 0;" text="Sell tickets" textFill="#f2f2f2" />
-                <Button fx:id="showingsNavItem" layoutX="335.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleShowingsManagement" prefHeight="31.0" prefWidth="115.0" style="-fx-background-color: #808080; -fx-background-radius: 0;" text="Manage showings" textFill="#f2f2f2" />
-                <Button fx:id="salesNavItem" layoutX="452.0" layoutY="44.0" mnemonicParsing="false" onAction="#handleSalesHistory" prefHeight="31.0" prefWidth="111.0" style="-fx-background-color: #808080; -fx-background-radius: 0;" text="View sales history" textFill="#f2f2f2" />
-            </children>
-        </AnchorPane>
+        <fx:include source="Navigation.fxml" fx:id="navigationPane" />
     </top>
     <center>
         <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: a6a6a6;" BorderPane.alignment="CENTER">

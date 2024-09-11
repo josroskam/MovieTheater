@@ -15,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -49,18 +50,22 @@ public class ManageShowingsController extends BaseController {
     private ObservableList<Movie> movieList;
     private InMemoryDatabase database;
 
+    @FXML
+    private AnchorPane navigationPane;  // Reference to the pane where Navigation.fxml is included
+
     public ManageShowingsController() {
-        this.database = new InMemoryDatabase();
         this.movieList = FXCollections.observableArrayList();
     }
 
     @Override
     public void initData(Object data) {
+        // Call the common method from BaseController to load navigation
         Context context = (Context) data;
         this.movieDatabase = context.getInMemoryDatabase().getMovieDatabase();
         this.user = context.getUser();
+        this.database = context.getInMemoryDatabase();
 
-        System.out.println("ManageShowingsController initialized with user: " + user.getFullName());
+        loadNavigation(navigationPane, context);
 
         // Bind the button disable properties to whether an item is selected
         editShowing.disableProperty().bind(Bindings.isNull(showingsTable.getSelectionModel().selectedItemProperty()));
@@ -87,8 +92,6 @@ public class ManageShowingsController extends BaseController {
     // Add showing button
     @FXML
     public void addShowing(ActionEvent event) throws IOException {
-        System.out.println("Opening SaveShowing.fxml without an object");
-
         // Pass the shared MovieDatabase, User, and null for Movie (new showing)
         MovieTheaterApplication.getSceneController().changeScene("SaveShowing", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
     }
@@ -104,23 +107,19 @@ public class ManageShowingsController extends BaseController {
             return;
         }
 
-        System.out.println("Opening SaveShowing.fxml with an object");
-
         // Open the SaveShowing.fxml scene
         try {
-            MovieTheaterApplication.getSceneController().changeScene("ManageShowings", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
+            MovieTheaterApplication.getSceneController().changeScene("SaveShowing", new Context(user, selectedMovie, MovieTheaterApplication.getInMemoryDatabase()));
         } catch (IOException e) {
             System.out.println("Error opening SaveShowing.fxml: " + e.getMessage());
         }
     }
 
     public void deleteShowing(ActionEvent event) {
-        // Get the selected movie from the TableView
         Movie selectedMovie = showingsTable.getSelectionModel().getSelectedItem();
 
-        // Check if a movie is selected
         if (selectedMovie == null) {
-            System.out.println("No movie selected for editing.");
+            System.out.println("No movie selected for deletion.");
             return;
         }
 
@@ -135,18 +134,5 @@ public class ManageShowingsController extends BaseController {
         } catch (Exception e) {
             System.out.println("Error deleting movie: " + e.getMessage());
         }
-    }
-
-    // Navigation handlers
-    public void handleTicketSales(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("TicketSales", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
-    }
-
-    public void handleShowingsManagement(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("ManageShowings", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
-    }
-
-    public void handleSalesHistory(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("SalesHistory", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
     }
 }

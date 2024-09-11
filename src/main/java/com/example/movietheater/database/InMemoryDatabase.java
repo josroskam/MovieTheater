@@ -21,7 +21,7 @@ public class InMemoryDatabase {
         userDatabase.addUser(new User("management", "jane doe", "management", Role.MANAGEMENT));
         userDatabase.addUser(new User("sales", "martin doe", "sales", Role.SALES));
 
-        movieDatabase.addMovie((new Movie(2, "Het regent gehaktballen", LocalDateTime.now(), LocalDateTime.now(), 72)));
+        movieDatabase.addMovie((new Movie(1, "The Hobbit", LocalDateTime.now(), LocalDateTime.now(), 72)));
     }
 
     public UserDatabase getUserDatabase() {

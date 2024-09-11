@@ -1,6 +1,8 @@
 package com.example.movietheater.model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 // movieShowing could be a better name
 public class Movie {
@@ -34,16 +36,16 @@ public class Movie {
         this.title = title;
     }
 
-    public String getStartTime(){
-        return this.formatDateTime(this.startTime);
+    public LocalDateTime  getStartTime(){
+        return this.startTime;
     }
 
     public void setStartTime(LocalDateTime startTime){
         this.startTime = startTime;
     }
 
-    public String getEndTime(){
-        return this.formatDateTime(this.endTime);
+    public LocalDateTime  getEndTime(){
+        return this.endTime;
     }
 
     public void setEndTime(LocalDateTime endTime){
@@ -58,8 +60,23 @@ public class Movie {
         this.seats = seats;
     }
 
-    // to dd-hh-yyyy hh:mm (e.g.) 01-01-2021 12:00
-    private String formatDateTime(LocalDateTime dateTime){
-        return dateTime.getDayOfMonth() + "-" + dateTime.getMonthValue() + "-" + dateTime.getYear() + " " + dateTime.getHour() + ":" + dateTime.getMinute();
+    private String formatDateTime(LocalDateTime dateTime) {
+        // Create a formatter with the pattern "dd-MM-yyyy HH:mm"
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
+        return dateTime.format(formatter);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Movie movie = (Movie) o;
+        return Objects.equals(id, movie.id);  // Compare based on unique 'id'
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);  // Use 'id' for generating hashcode
     }
 }
