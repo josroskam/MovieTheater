@@ -82,7 +82,6 @@ public class TicketSalesController  extends BaseController {
         selectedSeatLbl.setText("Selected movie: " + movieDetails);
     }
 
-
     // Populates the TableView with initial data
     private void populateTable() {
         // Get the shared ObservableList from the MovieDatabase
@@ -94,20 +93,6 @@ public class TicketSalesController  extends BaseController {
         seatsColumn.setCellValueFactory(new PropertyValueFactory<>("seats"));
 
         upcomingShowingsTable.setItems(movieList);
-    }
-
-
-
-    public void handleTicketSales(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("TicketSales", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
-    }
-
-    public void handleShowingsManagement(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("ManageShowings", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
-    }
-
-    public void handleSalesHistory(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("SalesHistory", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
     }
 
     public void selectSeats(ActionEvent event) throws IOException {

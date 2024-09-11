@@ -125,17 +125,4 @@ public class SaveShowingController extends  BaseController {
 
         return new Movie(id, title, startDateTime, endDateTime, 100);
     }
-
-    // Navigation handlers
-    public void handleTicketSales(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("TicketSales", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
-    }
-
-    public void handleShowingsManagement(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("ManageShowings", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
-    }
-
-    public void handleSalesHistory(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("SalesHistory", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
-    }
 }
