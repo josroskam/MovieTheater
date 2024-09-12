@@ -4,6 +4,7 @@ import com.example.movietheater.model.Context;
 import com.example.movietheater.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.event.ActionEvent;
@@ -32,17 +33,24 @@ public class SeatSelectionController extends BaseController {
     // Method to dynamically load seats into the GridPane
     private void loadSeats() {
         for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                Button seatButton = new Button(String.valueOf(col + 1));  // Display numbers 1 to 12
-                seatButton.setStyle("-fx-background-color: grey; -fx-padding: 10px;");  // Set padding
-                seatButton.setPrefWidth(40);  // Set fixed width
-                seatButton.setPrefHeight(40);  // Set fixed height
-                seatButton.setOnAction(this::handleSeatSelection);  // Handle seat selection
+            // Add label for row number in the first column (column 0)
+            String rowNumber = String.valueOf(row + 1);
+            Label rowLabel = new Label(String.valueOf("Row: " + rowNumber));  // Display row numbers 1 to 6
+            rowLabel.setPrefWidth(60);
+            rowLabel.setPrefHeight(40);
+            seatGridPane.add(rowLabel, 0, row);  // Add label to GridPane
+
+            // Add seat buttons starting from column 1
+            for (int col = 1; col <= cols; col++) {
+                Button seatButton = new Button(String.valueOf(col));  // Display seat number
+                seatButton.setStyle("-fx-background-color: grey; -fx-padding: 10px;");  // Button style
+                seatButton.setPrefWidth(40);
+                seatButton.setPrefHeight(40);
+                seatButton.setOnAction(this::handleSeatSelection);  // Set action for seat button
                 seatGridPane.add(seatButton, col, row);  // Add button to GridPane
             }
         }
     }
-
 
     @FXML
     private void handleSeatSelection(ActionEvent event) {
