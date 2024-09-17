@@ -9,10 +9,12 @@ import java.time.LocalDateTime;
 public class InMemoryDatabase {
     private UserDatabase userDatabase;
     private MovieDatabase movieDatabase;
+    private SalesDatabase salesDatabase;
 
     public InMemoryDatabase() {
         this.userDatabase = new UserDatabase();
         this.movieDatabase = new MovieDatabase();
+        this.salesDatabase = new SalesDatabase();
         initializeData();
     }
 
@@ -30,5 +32,9 @@ public class InMemoryDatabase {
 
     public MovieDatabase getMovieDatabase() {
         return movieDatabase;
+    }
+
+    public SalesDatabase getSalesDatabase() {
+        return salesDatabase;
     }
 }

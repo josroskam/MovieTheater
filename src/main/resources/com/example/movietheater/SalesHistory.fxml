@@ -15,8 +15,8 @@
     <center>
         <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: a6a6a6;" BorderPane.alignment="CENTER">
             <children>
-                <Label layoutX="33.0" layoutY="38.0" text="Manage showings" />
-                <TableView fx:id="showingsTable" layoutX="29.0" layoutY="62.0" prefHeight="200.0" prefWidth="524.0">
+                <Label layoutX="33.0" layoutY="38.0" text="Sales history" />
+                <TableView fx:id="salesTableView" layoutX="29.0" layoutY="62.0" prefHeight="200.0" prefWidth="524.0">
                     <columns>
                         <TableColumn fx:id="dateTimeColumn" prefWidth="75.0" text="Date/time" />
                         <TableColumn fx:id="ticketAmountColumn" prefWidth="75.0" text="Number of tickets" />

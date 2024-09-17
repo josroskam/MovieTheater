@@ -7,6 +7,7 @@ import com.example.movietheater.model.Context;
 import com.example.movietheater.model.Movie;
 import com.example.movietheater.model.User;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -28,10 +29,10 @@ public class ManageShowingsController extends BaseController {
     private TableView<Movie> showingsTable;
 
     @FXML
-    private TableColumn<Movie, LocalDateTime> startColumn;
+    private TableColumn<Movie, String> startColumn;
 
     @FXML
-    private TableColumn<Movie, LocalDateTime> endColumn;
+    private TableColumn<Movie, String> endColumn;
 
     @FXML
     private TableColumn<Movie, String> titleColumn;
@@ -80,12 +81,15 @@ public class ManageShowingsController extends BaseController {
         // Get the shared ObservableList from the MovieDatabase
         movieList = movieDatabase.getMovies();
 
-        startColumn.setCellValueFactory(new PropertyValueFactory<>("startTime"));
-        endColumn.setCellValueFactory(new PropertyValueFactory<>("endTime"));
+        // Use formatted string for start and end times
+        startColumn.setCellValueFactory(movie -> new SimpleStringProperty(movie.getValue().formatDateTime(movie.getValue().getStartTime())));
+        endColumn.setCellValueFactory(movie -> new SimpleStringProperty(movie.getValue().formatDateTime(movie.getValue().getEndTime())));
+
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         seatsColumn.setCellValueFactory(new PropertyValueFactory<>("seats"));
 
-        showingsTable.setItems(movieList); // Ensure the table is bound to the shared list
+        // Set the table's data
+        showingsTable.setItems(movieList);
     }
 
 

@@ -2,6 +2,7 @@ package com.example.movietheater.controller;
 
 import com.example.movietheater.MovieTheaterApplication;
 import com.example.movietheater.model.Context;
+import com.example.movietheater.model.Movie;
 import com.example.movietheater.model.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -40,13 +41,10 @@ public class DashboardController extends BaseController {
         roleLabel.setText("You are logged in as: " + user.getRole().toString());
 
         // Format the current date and time
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedDate = now.format(formatter);
 
-        String formattedDate = now.format(dateFormatter);
-        String formattedTime = now.format(timeFormatter);
-
-        datetimeLabel.setText("The current date and time is: " + formattedDate + " " + formattedTime);
+        datetimeLabel.setText("The current date and time is: " + formattedDate);
     }
 }

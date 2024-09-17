@@ -1,69 +1,62 @@
 package com.example.movietheater.model;
 
-import java.util.Dictionary;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 public class Sales {
-    private Integer id;
-    private User user;
+    private String id;
+    private String username;
     private Movie movie;
-    private Integer ticketAmount;
-    private String dateTime;
-    private Integer[][] seats;
+    private LocalDateTime dateTime;  // Use LocalDateTime for better date handling
+    private List<Seat> seats;  // List of seat coordinates instead of 2D array
 
-    public Sales(Integer id, User user, Movie movie, Integer ticketAmount, String dateTime, Integer[][] seats){
-        this.id = id;
-        this.user = user;
+    public Sales(String username, Movie movie, LocalDateTime dateTime, List<Seat> seats){
+        this.id = UUID.randomUUID().toString();  // Generates a unique UUID        ;
+        this.username = username;
         this.movie = movie;
-        this.ticketAmount = ticketAmount;
         this.dateTime = dateTime;
         this.seats = seats;
     }
 
-    public Integer getId(){
+    public String getId() {
         return this.id;
     }
 
-    public void setId(Integer id){
-        this.id = id;
+    public String getUsername() {
+        return this.username;
     }
 
-    public User getUser(){
-        return this.user;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public void setUser(User user){
-        this.user = user;
-    }
-
-    public Movie getMovie(){
+    public Movie getMovie() {
         return this.movie;
     }
 
-    public void setMovie(Movie movie){
+    public void setMovie(Movie movie) {
         this.movie = movie;
     }
 
-    public Integer getTicketAmount(){
-        return this.ticketAmount;
-    }
-
-    public void setTicketAmount(Integer ticketAmount){
-        this.ticketAmount = ticketAmount;
-    }
-
-    public String getDateTime(){
+    public LocalDateTime getDateTime() {
         return this.dateTime;
     }
 
-    public void setDateTime(String dateTime){
+    public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
 
-    public Integer[][] getSeats(){
+    public List<Seat> getSeats() {
         return this.seats;
     }
 
-    public void setSeats(Integer[][] seats){
+    public void setSeats(List<Seat> seats) {
         this.seats = seats;
+    }
+
+    // Derived property: total ticket amount is the size of the seats list
+    public int getTicketAmount() {
+        return this.seats.size();
     }
 }
