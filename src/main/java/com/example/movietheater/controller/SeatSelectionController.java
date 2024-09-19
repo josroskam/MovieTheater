@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 
 import java.io.IOException;
@@ -29,12 +30,19 @@ public class SeatSelectionController extends BaseController {
     @FXML
     private TextField customerNameField;
 
+    @FXML
+    private AnchorPane navigationPane;  // Reference to the pane where Navigation.fxml is included
+
+    @FXML
+    private Label movieTitleLabel;
+
     private SalesDatabase salesDatabase;  // Reference to the sales database
 
     private final int rows = 6;
     private final int cols = 12;
 
     private List<Seat> selectedSeats = new ArrayList<>();  // Store selected seats
+    private List<Seat> soldSeats = new ArrayList<>();      // Store already sold seats
 
     private User user;
     private Movie movie;
@@ -42,14 +50,27 @@ public class SeatSelectionController extends BaseController {
     @Override
     public void initData(Object data) {
         Context context = (Context) data;
+
         this.user = context.getUser();
         this.movie = context.getMovie();
-        this.salesDatabase = context.getInMemoryDatabase().getSalesDatabase();  // Initialize sales database
+        this.salesDatabase = context.getInMemoryDatabase().getSalesDatabase();
 
+        retrieveSoldSeats();
         loadSeats();
+        loadNavigation(navigationPane, context);
+
+        movieTitleLabel.setText(movie.getStartTime() + " " + movie.getTitle());
     }
 
-    // Method to dynamically load seats into the GridPaneGridPane
+    // Method to retrieve sold seats for the current movie
+    private void retrieveSoldSeats() {
+        List<Sales> salesList = salesDatabase.getSalesByMovie(movie);
+        for (Sales sale : salesList) {
+            soldSeats.addAll(sale.getSeats());  // Add all sold seats to the soldSeats list
+        }
+    }
+
+    // Method to dynamically load seats into the GridPane
     private void loadSeats() {
         for (int row = 0; row < rows; row++) {
             // Add a label with the row number at the start of each row
@@ -64,9 +85,26 @@ public class SeatSelectionController extends BaseController {
 
                 // Create a button for each seat
                 Button seatButton = new Button(String.valueOf(currentCol + 1));  // Display numbers 1 to 12
+
+                // Set fixed size for the button
+                seatButton.setMinWidth(40);  // Minimum width
+                seatButton.setMinHeight(40);  // Minimum height
+                seatButton.setPrefWidth(40);  // Preferred width
+                seatButton.setPrefHeight(40);  // Preferred height
+                seatButton.setMaxWidth(40);  // Maximum width
+                seatButton.setMaxHeight(40);  // Maximum height
+
                 seatButton.setStyle("-fx-background-color: grey; -fx-padding: 10px;");
 
-                seatButton.setOnAction(event -> handleSeatSelection(event, currentRow, currentCol));
+                Seat seat = new Seat(currentRow, currentCol);
+
+                // Check if the seat is sold and mark it accordingly
+                if (soldSeats.contains(seat)) {
+                    seatButton.setStyle("-fx-background-color: red; -fx-padding: 10px;");
+                    seatButton.setDisable(true);  // Disable the button for sold seats
+                } else {
+                    seatButton.setOnAction(event -> handleSeatSelection(event, currentRow, currentCol));
+                }
 
                 // Add the button to the GridPane starting from column 1 (as column 0 is reserved for row labels)
                 seatGridPane.add(seatButton, currentCol + 1, currentRow);  // Column shifted by +1
@@ -88,14 +126,11 @@ public class SeatSelectionController extends BaseController {
             selectedSeats.add(seat);  // Add seat to the selected seats list
         }
 
-        // sout the amount of selected seats
-        System.out.println("Selected seats: " + selectedSeats.size());
+        // Update the number of selected seats
         confirmSelectionBtn.setText("Sell " + selectedSeats.size() + " tickets");
 
         // Update the label to show selected seats
         updateSelectedSeatsLabel();
-
-        System.out.println("Selected seats: " + selectedSeats);
     }
 
     // Method to update the label showing selected seats
@@ -110,16 +145,12 @@ public class SeatSelectionController extends BaseController {
     // Method to confirm seat selection and create a sales object
     public void confirmSelection() throws IOException {
         // Create a new Sales object based on selected seats
-        Sales sales = new Sales(customerNameField.getText(), movie, LocalDateTime.now(), selectedSeats);  // Passing null for the movie here
+        Sales sales = new Sales(customerNameField.getText(), movie, LocalDateTime.now(), selectedSeats);
 
-        // add to db
+        // Add the sale to the database
         salesDatabase.addSale(sales);
 
-        // Print selected seats for confirmation
-        System.out.println("Sales created with selected seats: " + sales.getSeats());
-        System.out.println("Selected movie: confirm" + movie.getTitle());
-
+        // Return to ticket sales view
         MovieTheaterApplication.getSceneController().changeScene("TicketSales", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
-
     }
 }

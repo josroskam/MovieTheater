@@ -41,7 +41,7 @@ public class DashboardController extends BaseController {
         roleLabel.setText("You are logged in as: " + user.getRole().toString());
 
         // Format the current date and time
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
         String formattedDate = now.format(formatter);
 

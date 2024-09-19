@@ -1,6 +1,7 @@
 package com.example.movietheater.model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,5 +59,12 @@ public class Sales {
     // Derived property: total ticket amount is the size of the seats list
     public int getTicketAmount() {
         return this.seats.size();
+    }
+
+    public String formatDateTime(LocalDateTime dateTime) {
+        // Create a formatter with the pattern "dd-MM-yyyy HH:mm"
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
+        return dateTime.format(formatter);
     }
 }
