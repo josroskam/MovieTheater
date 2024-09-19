@@ -4,7 +4,10 @@ import com.example.movietheater.database.InMemoryDatabase;
 import com.example.movietheater.model.Movie;
 import com.example.movietheater.model.User;
 
-public class Context {
+import java.io.Serializable;
+
+public class Context implements Serializable {
+    private static final long serialVersionUID = 1L;
     private User user;
     private Movie movie;
     private InMemoryDatabase inMemoryDatabase;

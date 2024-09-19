@@ -21,6 +21,7 @@ import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 // only visible to management
 public class ManageShowingsController extends BaseController {

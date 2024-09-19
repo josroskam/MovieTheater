@@ -4,31 +4,32 @@ import com.example.movietheater.model.Movie;
 import com.example.movietheater.model.Role;
 import com.example.movietheater.model.User;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class InMemoryDatabase {
-    private UserDatabase userDatabase;
+public class InMemoryDatabase implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private MovieDatabase movieDatabase;
     private SalesDatabase salesDatabase;
+    private UserDatabase userDatabase;
 
     public InMemoryDatabase() {
-        this.userDatabase = new UserDatabase();
         this.movieDatabase = new MovieDatabase();
         this.salesDatabase = new SalesDatabase();
-        initializeData();
+        this.userDatabase = new UserDatabase();
+        // initUsers();
     }
 
-    private void initializeData() {
-        userDatabase.addUser(new User("admin", "john doe", "admin", Role.ADMIN));
-        userDatabase.addUser(new User("management", "jane doe", "management", Role.MANAGEMENT));
-        userDatabase.addUser(new User("sales", "martin doe", "sales", Role.SALES));
-
-        movieDatabase.addMovie((new Movie(1, "The Hobbit", LocalDateTime.now(), LocalDateTime.now(), 72)));
-    }
-
-    public UserDatabase getUserDatabase() {
-        return userDatabase;
-    }
+//    private void initUsers(){
+//        User user4 = new User("mike_jones", "Mike Jones", "mikePassword2024", Role.MANAGEMENT);
+//        User user5 = new User("lisa_lee", "Lisa Lee", "lisaPass2024", Role.SALES);
+//        User user6 = new User("susan_wong", "Susan Wong", "susanPass2024", Role.ADMIN);
+//
+//        userDatabase.addUser(user4);
+//        userDatabase.addUser(user5);
+//        userDatabase.addUser(user6);
+//    }
 
     public MovieDatabase getMovieDatabase() {
         return movieDatabase;
@@ -36,5 +37,21 @@ public class InMemoryDatabase {
 
     public SalesDatabase getSalesDatabase() {
         return salesDatabase;
+    }
+
+    public UserDatabase getUserDatabase() {
+        return userDatabase;
+    }
+
+    public void setMovieDatabase(MovieDatabase movieDatabase) {
+        this.movieDatabase = movieDatabase;
+    }
+
+    public void setSalesDatabase(SalesDatabase salesDatabase) {
+        this.salesDatabase = salesDatabase;
+    }
+
+    public void setUserDatabase(UserDatabase userDatabase) {
+        this.userDatabase = userDatabase;
     }
 }

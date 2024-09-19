@@ -5,25 +5,25 @@ import com.example.movietheater.model.Sales;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SalesDatabase {
-    // Use a List or ObservableList instead of a Map
-    private List<Sales> sales;
+public class SalesDatabase implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private List<Sales> sales;  // Use List<Sales> for serialization
 
     public SalesDatabase() {
-        this.sales = new ArrayList<>();  // Initialize with an empty list
+        this.sales = new ArrayList<>();
     }
 
-    // Add a sale to the list
     public void addSale(Sales sale) {
         sales.add(sale);
     }
 
-    // Return the sales as an ObservableList for TableView compatibility
     public ObservableList<Sales> getAllSales() {
-        return FXCollections.observableArrayList(sales);  // Wrap the list into an ObservableList
+        return FXCollections.observableArrayList(sales);  // Convert to ObservableList when needed
     }
 
     public List<Sales> getSalesByMovie(Movie movie) {
@@ -44,5 +44,4 @@ public class SalesDatabase {
         }
         return soldSeats;
     }
-
 }

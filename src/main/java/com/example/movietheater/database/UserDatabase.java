@@ -1,12 +1,13 @@
 package com.example.movietheater.database;
 
 import com.example.movietheater.model.User;
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class UserDatabase {
+public class UserDatabase implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Map<String, User> users;
 
     public UserDatabase() {

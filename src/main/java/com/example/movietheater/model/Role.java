@@ -1,5 +1,7 @@
 package com.example.movietheater.model;
 
-public enum Role {
+import java.io.Serializable;
+
+public enum Role implements Serializable {
     ADMIN, MANAGEMENT, SALES
 }

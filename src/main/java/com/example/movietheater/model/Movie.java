@@ -1,12 +1,13 @@
 package com.example.movietheater.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 // movieShowing could be a better name
-public class Movie {
-    private Integer id;
+public class Movie implements Serializable {
+    private static final long serialVersionUID = 1L;    private Integer id;
     private String title;
     private LocalDateTime startTime;
     private LocalDateTime endTime;

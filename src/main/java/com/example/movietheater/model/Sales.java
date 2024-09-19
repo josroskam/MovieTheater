@@ -1,11 +1,13 @@
 package com.example.movietheater.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
-public class Sales {
+public class Sales implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String id;
     private String username;
     private Movie movie;

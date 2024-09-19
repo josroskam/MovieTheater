@@ -1,8 +1,10 @@
 package com.example.movietheater.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Seat {
+public class Seat implements Serializable {
+    private static final long serialVersionUID = 1L;
     private int row;
     private int column;
 
