@@ -15,6 +15,7 @@ public class NavigationController {
 
     // Navigation handlers
     public void handleTicketSales(ActionEvent event) throws IOException {
+        System.out.println("Navigating to Ticket Sales");
         MovieTheaterApplication.getSceneController().changeScene("TicketSales", context);
     }
 

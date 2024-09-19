@@ -1,5 +1,6 @@
 package com.example.movietheater.database;
 
+import com.example.movietheater.model.Movie;
 import com.example.movietheater.model.Sales;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,4 +25,24 @@ public class SalesDatabase {
     public ObservableList<Sales> getAllSales() {
         return FXCollections.observableArrayList(sales);  // Wrap the list into an ObservableList
     }
+
+    public List<Sales> getSalesByMovie(Movie movie) {
+        List<Sales> salesByMovie = new ArrayList<>();
+        for (Sales sale : sales) {
+            if (sale.getMovie().equals(movie)) {
+                salesByMovie.add(sale);
+            }
+        }
+        return salesByMovie;
+    }
+
+    public int getSeatsSoldForMovie(Movie movie) {
+        List<Sales> salesList = getSalesByMovie(movie);
+        int soldSeats = 0;
+        for (Sales sale : salesList) {
+            soldSeats += sale.getSeats().size();  // Assuming each sale has a list of sold seats
+        }
+        return soldSeats;
+    }
+
 }

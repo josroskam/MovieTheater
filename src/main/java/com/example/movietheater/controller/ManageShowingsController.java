@@ -3,6 +3,7 @@ package com.example.movietheater.controller;
 import com.example.movietheater.MovieTheaterApplication;
 import com.example.movietheater.database.InMemoryDatabase;
 import com.example.movietheater.database.MovieDatabase;
+import com.example.movietheater.database.SalesDatabase;
 import com.example.movietheater.model.Context;
 import com.example.movietheater.model.Movie;
 import com.example.movietheater.model.User;
@@ -38,7 +39,7 @@ public class ManageShowingsController extends BaseController {
     private TableColumn<Movie, String> titleColumn;
 
     @FXML
-    private TableColumn<Movie, Integer> seatsColumn;
+    private TableColumn<Movie, String> seatsColumn;
 
     @FXML
     private Button editShowing;
@@ -47,7 +48,7 @@ public class ManageShowingsController extends BaseController {
     private Button deleteShowing;
 
     private MovieDatabase movieDatabase;
-
+    private SalesDatabase salesDatabase;
     private ObservableList<Movie> movieList;
     private InMemoryDatabase database;
 
@@ -63,10 +64,19 @@ public class ManageShowingsController extends BaseController {
         // Call the common method from BaseController to load navigation
         Context context = (Context) data;
         this.movieDatabase = context.getInMemoryDatabase().getMovieDatabase();
+        this.salesDatabase = context.getInMemoryDatabase().getSalesDatabase();
         this.user = context.getUser();
         this.database = context.getInMemoryDatabase();
 
         loadNavigation(navigationPane, context);
+
+        // Ensure each column takes up 25% of the TableView's width
+        showingsTable.widthProperty().addListener((obs, oldWidth, newWidth) -> {
+            startColumn.setPrefWidth(newWidth.doubleValue() * 0.25);
+            endColumn.setPrefWidth(newWidth.doubleValue() * 0.25);
+            titleColumn.setPrefWidth(newWidth.doubleValue() * 0.25);
+            seatsColumn.setPrefWidth(newWidth.doubleValue() * 0.25);
+        });
 
         // Bind the button disable properties to whether an item is selected
         editShowing.disableProperty().bind(Bindings.isNull(showingsTable.getSelectionModel().selectedItemProperty()));
@@ -81,12 +91,20 @@ public class ManageShowingsController extends BaseController {
         // Get the shared ObservableList from the MovieDatabase
         movieList = movieDatabase.getMovies();
 
+        // Update seats column with "X/Y" format where X is remaining seats and Y is total seats
+        seatsColumn.setCellValueFactory(movie -> {
+            int totalSeats = movie.getValue().getSeats();
+            int soldSeats = salesDatabase.getSeatsSoldForMovie(movie.getValue());  // Assuming you have a method to get sold seats
+            String seatsLeft = movie.getValue().getRemainingSeats(soldSeats) + "/" + totalSeats;
+            return new SimpleStringProperty(seatsLeft);
+        });
+
         // Use formatted string for start and end times
         startColumn.setCellValueFactory(movie -> new SimpleStringProperty(movie.getValue().formatDateTime(movie.getValue().getStartTime())));
         endColumn.setCellValueFactory(movie -> new SimpleStringProperty(movie.getValue().formatDateTime(movie.getValue().getEndTime())));
 
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-        seatsColumn.setCellValueFactory(new PropertyValueFactory<>("seats"));
+//        seatsColumn.setCellValueFactory(new PropertyValueFactory<>("seats"));
 
         // Set the table's data
         showingsTable.setItems(movieList);

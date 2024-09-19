@@ -60,6 +60,11 @@ public class Movie {
         this.seats = seats;
     }
 
+    public int getRemainingSeats(int soldSeats) {
+        return this.seats - soldSeats;  // Calculate remaining seats
+    }
+
+
     public String formatDateTime(LocalDateTime dateTime) {
         // Create a formatter with the pattern "dd-MM-yyyy HH:mm"
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");

@@ -46,6 +46,13 @@ public class SalesHistoryController extends BaseController {
         this.user = context.getUser();
 
         loadNavigation(navigationPane, context);
+
+        salesTableView.widthProperty().addListener((obs, oldWidth, newWidth) -> {
+            dateTimeColumn.setPrefWidth(newWidth.doubleValue() * 0.20);
+            ticketAmountColumn.setPrefWidth(newWidth.doubleValue() * 0.20);
+            customerColumn.setPrefWidth(newWidth.doubleValue() * 0.25);
+            showingColumn.setPrefWidth(newWidth.doubleValue() * 0.40);
+        });
         populateTable();
     }
 
@@ -55,19 +62,13 @@ public class SalesHistoryController extends BaseController {
         salesList = FXCollections.observableArrayList(salesDatabase.getAllSales());
 
         // Bind the columns to the Sales properties
-        dateTimeColumn.setCellValueFactory(sales -> new SimpleStringProperty(sales.getValue().getDateTime().toString()));
+        dateTimeColumn.setCellValueFactory(sales -> new SimpleStringProperty(sales.getValue().formatDateTime(sales.getValue().getDateTime())));
         ticketAmountColumn.setCellValueFactory(new PropertyValueFactory<>("ticketAmount"));
         customerColumn.setCellValueFactory(sales -> new SimpleStringProperty(sales.getValue().getUsername()));
 
-        LocalDateTime startTime = salesList.get(0).getMovie().getStartTime();
+        // Use the movie's start time as the showing column including the movie title
 
-        // use formatDateTime from movie class
-        String title = salesList.get(0).getMovie().getTitle();
-
-        // Bind the showing column to the movie title
-        String showing = " (" + startTime + ")" + title;
-
-        showingColumn.setCellValueFactory(sales -> new SimpleStringProperty(showing));
+        showingColumn.setCellValueFactory(sales -> new SimpleStringProperty(sales.getValue().getMovie().getTitle() + " at " + sales.getValue().getMovie().formatDateTime(sales.getValue().getMovie().getStartTime())));
 
         // Set the data to the TableView
         salesTableView.setItems(salesList);
@@ -78,3 +79,5 @@ public class SalesHistoryController extends BaseController {
         }
     }
 }
+
+
