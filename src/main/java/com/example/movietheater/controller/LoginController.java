@@ -26,15 +26,13 @@ public class LoginController extends BaseController {
     private PasswordField passwordTextField;
 
     private UserService userService;
-    private MovieDatabase movieDatabase; // Now we will use the shared InMemoryDatabase
     private InMemoryDatabase inMemoryDatabase;
 
     @Override
-    public void initData(Object data) {
+    public void initialize(Object data) {
         Context context = (Context) data;
         this.inMemoryDatabase = context.getInMemoryDatabase();
         this.userService = new UserService(inMemoryDatabase); // Use shared database for user validation
-        this.movieDatabase = context.getInMemoryDatabase().getMovieDatabase();
     }
 
     @FXML
@@ -45,7 +43,6 @@ public class LoginController extends BaseController {
         User user = userService.validateUser(username, password);
 
         if (user != null) {
-            loginResponseLabel.setText("Login successful");
             // Pass the user and the shared InMemoryDatabase when navigating to the Dashboard
             MovieTheaterApplication.getSceneController().changeScene("Dashboard", new Context(user, null, inMemoryDatabase));
         } else {

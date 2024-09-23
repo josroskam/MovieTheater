@@ -48,7 +48,7 @@ public class SeatSelectionController extends BaseController {
     private Movie movie;
 
     @Override
-    public void initData(Object data) {
+    public void initialize(Object data) {
         Context context = (Context) data;
 
         this.user = context.getUser();

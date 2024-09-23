@@ -14,6 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -48,21 +49,23 @@ public class ManageShowingsController extends BaseController {
     @FXML
     private Button deleteShowing;
 
+    @FXML
+    private Label errorLabel;
+
     private MovieDatabase movieDatabase;
     private SalesDatabase salesDatabase;
     private ObservableList<Movie> movieList;
     private InMemoryDatabase database;
 
     @FXML
-    private AnchorPane navigationPane;  // Reference to the pane where Navigation.fxml is included
+    private AnchorPane navigationPane;
 
     public ManageShowingsController() {
         this.movieList = FXCollections.observableArrayList();
     }
 
     @Override
-    public void initData(Object data) {
-        // Call the common method from BaseController to load navigation
+    public void initialize(Object data) {
         Context context = (Context) data;
         this.movieDatabase = context.getInMemoryDatabase().getMovieDatabase();
         this.salesDatabase = context.getInMemoryDatabase().getSalesDatabase();
@@ -105,7 +108,6 @@ public class ManageShowingsController extends BaseController {
         endColumn.setCellValueFactory(movie -> new SimpleStringProperty(movie.getValue().formatDateTime(movie.getValue().getEndTime())));
 
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-//        seatsColumn.setCellValueFactory(new PropertyValueFactory<>("seats"));
 
         // Set the table's data
         showingsTable.setItems(movieList);
@@ -143,6 +145,12 @@ public class ManageShowingsController extends BaseController {
 
         if (selectedMovie == null) {
             System.out.println("No movie selected for deletion.");
+            return;
+        }
+
+        // check if the movie has already sold tickets
+        if (salesDatabase.getSeatsSoldForMovie(selectedMovie) > 0) {
+            errorLabel.setText("Cannot delete a movie that has already sold tickets.");
             return;
         }
 

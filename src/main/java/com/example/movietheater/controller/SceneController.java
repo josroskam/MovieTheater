@@ -1,6 +1,5 @@
 package com.example.movietheater.controller;
 
-import com.example.movietheater.model.Context;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -21,7 +20,7 @@ public class SceneController {
         BaseController controller = loader.getController();
 
         // Initialize the data for the main controller
-        controller.initData(data);
+        controller.initialize(data);
 
         // Check if the navigation bar exists and initialize it with the context
         NavigationController navController = (NavigationController) loader.getNamespace().get("navigationController");

@@ -2,6 +2,7 @@ package com.example.movietheater.controller;
 
 import com.example.movietheater.MovieTheaterApplication;
 import com.example.movietheater.model.Context;
+import com.example.movietheater.model.Role;
 import javafx.event.ActionEvent;
 
 import java.io.IOException;
@@ -15,15 +16,20 @@ public class NavigationController {
 
     // Navigation handlers
     public void handleTicketSales(ActionEvent event) throws IOException {
-        System.out.println("Navigating to Ticket Sales");
-        MovieTheaterApplication.getSceneController().changeScene("TicketSales", context);
+        if (context.getUser().getRole().equals(Role.SALES)) {
+            MovieTheaterApplication.getSceneController().changeScene("TicketSales", context);
+        }
     }
 
     public void handleShowingsManagement(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("ManageShowings", context);
+        if (context.getUser().getRole().equals(Role.MANAGEMENT)) {
+            MovieTheaterApplication.getSceneController().changeScene("ManageShowings", context);
+        }
     }
 
     public void handleSalesHistory(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("SalesHistory", context);
+        if (context.getUser().getRole().equals(Role.MANAGEMENT)) {
+            MovieTheaterApplication.getSceneController().changeScene("SalesHistory", context);
+        }
     }
 }

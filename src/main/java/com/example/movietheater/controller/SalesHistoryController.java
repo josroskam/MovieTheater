@@ -40,7 +40,7 @@ public class SalesHistoryController extends BaseController {
     private AnchorPane navigationPane;  // Reference to the pane where Navigation.fxml is included
 
     @Override
-    public void initData(Object data) {
+    public void initialize(Object data) {
         Context context = (Context) data;
         this.salesDatabase = context.getInMemoryDatabase().getSalesDatabase();
         this.user = context.getUser();

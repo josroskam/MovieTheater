@@ -52,16 +52,11 @@ public class TicketSalesController  extends BaseController {
     private AnchorPane navigationPane;  // Reference to the pane where Navigation.fxml is included
 
     @Override
-    public void initData(Object data) {
+    public void initialize(Object data) {
         Context context = (Context) data;
         this.movieDatabase = context.getInMemoryDatabase().getMovieDatabase();
         this.salesDatabase = context.getInMemoryDatabase().getSalesDatabase();
         this.user = context.getUser();
-
-        if (context == null) {
-            System.out.println("Context is null");  // Log to help with debugging
-            return;
-        }
 
         loadNavigation(navigationPane, context);
 
@@ -103,7 +98,7 @@ public class TicketSalesController  extends BaseController {
     // Populates the TableView with initial data
     private void populateTable() {
         // Get the shared ObservableList from the MovieDatabase
-        movieList = movieDatabase.getMovies();
+        movieList = movieDatabase.getMoviesInFuture();
 
         // Use formatted string for start and end times
         startColumn.setCellValueFactory(movie -> new SimpleStringProperty(movie.getValue().formatDateTime(movie.getValue().getStartTime())));

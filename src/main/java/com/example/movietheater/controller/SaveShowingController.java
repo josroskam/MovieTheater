@@ -5,6 +5,7 @@ import com.example.movietheater.database.MovieDatabase;
 import com.example.movietheater.model.Context;
 import com.example.movietheater.model.Movie;
 import com.example.movietheater.model.User;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -53,11 +54,16 @@ public class SaveShowingController extends  BaseController {
     private AnchorPane navigationPane;  // Reference to the pane where Navigation.fxml is included
 
     @Override
-    public void initData(Object data) {
+    public void initialize(Object data) {
         Context context = (Context) data;
         this.user = context.getUser();
         this.movie = context.getMovie();
         this.movieDatabase = context.getInMemoryDatabase().getMovieDatabase();
+
+        // set focus on title field
+//        title.requestFocus();
+        Platform.runLater(() -> title.requestFocus());
+
 
         loadNavigation(navigationPane, context);
 
@@ -68,6 +74,8 @@ public class SaveShowingController extends  BaseController {
         } else {
             createMovie();
         }
+
+
     }
 
     private void editMovie() {
@@ -98,14 +106,12 @@ public class SaveShowingController extends  BaseController {
 
         // check if boolean isEditing is true
         if (isEditing) {
-            // update the movie in the database
             movieDatabase.updateMovie(newMovie);
-            System.out.println("Movie updated in database: " + newMovie);
         } else {
-            // add the movie to the database
             movieDatabase.addMovie(newMovie);
-            System.out.println("Movie added to database: " + newMovie);
         }
+
+        MovieTheaterApplication.getSceneController().changeScene("ManageShowings", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
     }
 
     // Get the values from the form
