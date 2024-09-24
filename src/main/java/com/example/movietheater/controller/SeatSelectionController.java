@@ -19,6 +19,9 @@ import java.util.List;
 public class SeatSelectionController extends BaseController {
 
     @FXML
+    private Label errorLabel;
+
+    @FXML
     private GridPane seatGridPane;
 
     @FXML
@@ -59,7 +62,7 @@ public class SeatSelectionController extends BaseController {
         loadSeats();
         loadNavigation(navigationPane, context);
 
-        movieTitleLabel.setText(movie.getStartTime() + " " + movie.getTitle());
+        movieTitleLabel.setText(movie.formatDateTime(movie.getStartTime()) + " " + movie.getTitle());
     }
 
     // Method to retrieve sold seats for the current movie
@@ -144,6 +147,16 @@ public class SeatSelectionController extends BaseController {
 
     // Method to confirm seat selection and create a sales object
     public void confirmSelection() throws IOException {
+        if (selectedSeats.isEmpty()) {
+            errorLabel.setText("Please select at least one seat.");
+            return;
+        }
+
+        if (customerNameField.getText().isEmpty()) {
+            errorLabel.setText("Please enter customer name.");
+            return;
+        }
+
         // Create a new Sales object based on selected seats
         Sales sales = new Sales(customerNameField.getText(), movie, LocalDateTime.now(), selectedSeats);
 
@@ -151,6 +164,10 @@ public class SeatSelectionController extends BaseController {
         salesDatabase.addSale(sales);
 
         // Return to ticket sales view
+        MovieTheaterApplication.getSceneController().changeScene("TicketSales", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
+    }
+
+    public void cancelSelection(ActionEvent event) throws IOException {
         MovieTheaterApplication.getSceneController().changeScene("TicketSales", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
     }
 }

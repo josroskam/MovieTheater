@@ -60,10 +60,7 @@ public class SaveShowingController extends  BaseController {
         this.movie = context.getMovie();
         this.movieDatabase = context.getInMemoryDatabase().getMovieDatabase();
 
-        // set focus on title field
-//        title.requestFocus();
         Platform.runLater(() -> title.requestFocus());
-
 
         loadNavigation(navigationPane, context);
 
@@ -74,12 +71,10 @@ public class SaveShowingController extends  BaseController {
         } else {
             createMovie();
         }
-
-
     }
 
     private void editMovie() {
-        heading.setText("Creating a new movie");
+        heading.setText("Editing a movie");
         saveShowing.setText("Edit movie");
         title.setText(movie.getTitle());
 
@@ -87,9 +82,8 @@ public class SaveShowingController extends  BaseController {
         startDate.setValue(movie.getStartTime().toLocalDate());
         endDate.setValue(movie.getEndTime().toLocalDate());
 
-        // Set the time values
-        startTime.setText(movie.getStartTime().toLocalTime().toString());
-        endTime.setText(movie.getEndTime().toLocalTime().toString());
+        startTime.setText(movie.formatDateTime(movie.getStartTime()).split(" ")[1]);
+        endTime.setText(movie.formatDateTime(movie.getEndTime()).split(" ")[1]);
     }
 
     private void createMovie() {
@@ -116,7 +110,6 @@ public class SaveShowingController extends  BaseController {
 
     // Get the values from the form
     private Movie readMovie() {
-        Integer id = movie != null ? movie.getId() : null;
         String title = this.title.getText();
 
         String startDate = this.startDate.getValue().toString();
@@ -129,6 +122,13 @@ public class SaveShowingController extends  BaseController {
 
         LocalDateTime endDateTime = LocalDateTime.parse(endDate + "T" + endTime);
 
-        return new Movie(id, title, startDateTime, endDateTime, 100);
+        if (isEditing) {
+            movie.setTitle(title);
+            movie.setStartTime(startDateTime);
+            movie.setEndTime(endDateTime);
+            return movie;
+        }
+
+        return new Movie(title, startDateTime, endDateTime, 100);
     }
 }
