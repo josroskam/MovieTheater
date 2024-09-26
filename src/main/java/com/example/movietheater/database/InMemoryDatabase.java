@@ -18,18 +18,27 @@ public class InMemoryDatabase implements Serializable {
         this.movieDatabase = new MovieDatabase();
         this.salesDatabase = new SalesDatabase();
         this.userDatabase = new UserDatabase();
-        // initUsers();
+         initUsers();
     }
 
-//    private void initUsers(){
-//        User user4 = new User("mike_jones", "Mike Jones", "mikePassword2024", Role.MANAGEMENT);
-//        User user5 = new User("lisa_lee", "Lisa Lee", "lisaPass2024", Role.SALES);
-//        User user6 = new User("susan_wong", "Susan Wong", "susanPass2024", Role.ADMIN);
-//
-//        userDatabase.addUser(user4);
-//        userDatabase.addUser(user5);
-//        userDatabase.addUser(user6);
-//    }
+    private void initUsers(){
+        User user4 = new User("mike_jones", "Mike Jones", "mikePassword2024", Role.MANAGEMENT);
+        User user5 = new User("lisa_lee", "Lisa Lee", "lisaPass2024", Role.SALES);
+        User user6 = new User("susan_wong", "Susan Wong", "susanPass2024", Role.ADMIN);
+        User user7 = new User("admin", "Joe Smith", "admin", Role.SALES);
+
+        userDatabase.addUser(user4);
+        userDatabase.addUser(user5);
+        userDatabase.addUser(user6);
+        userDatabase.addUser(user7);
+
+        Movie movie1 = new Movie( "Movie 1", LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(2), 100);
+        Movie movie2 = new Movie( "Movie 2", LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(2), 100);
+
+        movieDatabase.addMovie(movie1);
+        movieDatabase.addMovie(movie2);
+
+    }
 
     public MovieDatabase getMovieDatabase() {
         return movieDatabase;
@@ -41,17 +50,5 @@ public class InMemoryDatabase implements Serializable {
 
     public UserDatabase getUserDatabase() {
         return userDatabase;
-    }
-
-    public void setMovieDatabase(MovieDatabase movieDatabase) {
-        this.movieDatabase = movieDatabase;
-    }
-
-    public void setSalesDatabase(SalesDatabase salesDatabase) {
-        this.salesDatabase = salesDatabase;
-    }
-
-    public void setUserDatabase(UserDatabase userDatabase) {
-        this.userDatabase = userDatabase;
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
 public class SalesDatabase implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private List<Sales> sales;  // Use List<Sales> for serialization
+    private List<Sales> sales;
 
     public SalesDatabase() {
         this.sales = new ArrayList<>();
@@ -23,7 +23,7 @@ public class SalesDatabase implements Serializable {
     }
 
     public ObservableList<Sales> getAllSales() {
-        return FXCollections.observableArrayList(sales);  // Convert to ObservableList when needed
+        return FXCollections.observableArrayList(sales);
     }
 
     public List<Sales> getSalesByMovie(Movie movie) {

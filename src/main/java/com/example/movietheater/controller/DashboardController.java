@@ -28,6 +28,8 @@ public class DashboardController extends BaseController {
 
     private User user;
 
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+
     @Override
     public void initialize(Object data) {
         Context context = (Context) data;
@@ -41,10 +43,7 @@ public class DashboardController extends BaseController {
         roleLabel.setText("You are logged in as: " + user.getRole().toString());
 
         // Format the current date and time
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
-        String formattedDate = now.format(formatter);
-
-        datetimeLabel.setText("The current date and time is: " + formattedDate);
+        datetimeLabel.setText("The current date and time is: " + now.format(DATE_TIME_FORMATTER));
     }
 }

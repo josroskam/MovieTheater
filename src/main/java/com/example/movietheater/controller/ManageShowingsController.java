@@ -1,15 +1,12 @@
 package com.example.movietheater.controller;
 
 import com.example.movietheater.MovieTheaterApplication;
-import com.example.movietheater.database.InMemoryDatabase;
-import com.example.movietheater.database.MovieDatabase;
-import com.example.movietheater.database.SalesDatabase;
 import com.example.movietheater.model.Context;
 import com.example.movietheater.model.Movie;
 import com.example.movietheater.model.User;
+import com.example.movietheater.service.ShowingsService;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,12 +18,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
 
-// only visible to management
 public class ManageShowingsController extends BaseController {
-    private User user;
+
+    private static final double COLUMN_WIDTH_RATIO = 0.25;
 
     @FXML
     private TableView<Movie> showingsTable;
@@ -52,53 +47,53 @@ public class ManageShowingsController extends BaseController {
     @FXML
     private Label errorLabel;
 
-    private MovieDatabase movieDatabase;
-    private SalesDatabase salesDatabase;
-    private ObservableList<Movie> movieList;
-    private InMemoryDatabase database;
-
     @FXML
     private AnchorPane navigationPane;
 
-    public ManageShowingsController() {
-        this.movieList = FXCollections.observableArrayList();
-    }
+    private ShowingsService showingsService;
+    private ObservableList<Movie> movieList;
+    private User user;
+    private Movie selectedMovie;
 
     @Override
     public void initialize(Object data) {
         Context context = (Context) data;
-        this.movieDatabase = context.getInMemoryDatabase().getMovieDatabase();
-        this.salesDatabase = context.getInMemoryDatabase().getSalesDatabase();
+        this.showingsService = new ShowingsService(context.getInMemoryDatabase());
         this.user = context.getUser();
-        this.database = context.getInMemoryDatabase();
 
         loadNavigation(navigationPane, context);
 
-        // Ensure each column takes up 25% of the TableView's width
-        showingsTable.widthProperty().addListener((obs, oldWidth, newWidth) -> {
-            startColumn.setPrefWidth(newWidth.doubleValue() * 0.25);
-            endColumn.setPrefWidth(newWidth.doubleValue() * 0.25);
-            titleColumn.setPrefWidth(newWidth.doubleValue() * 0.25);
-            seatsColumn.setPrefWidth(newWidth.doubleValue() * 0.25);
-        });
-
-        // Bind the button disable properties to whether an item is selected
-        editShowing.disableProperty().bind(Bindings.isNull(showingsTable.getSelectionModel().selectedItemProperty()));
-        deleteShowing.disableProperty().bind(Bindings.isNull(showingsTable.getSelectionModel().selectedItemProperty()));
+        setupTableWidthListener();
+        setupButtonBindings();
 
         // Initialize the data
         populateTable();
     }
 
+    private void setupTableWidthListener() {
+        showingsTable.widthProperty().addListener((obs, oldWidth, newWidth) -> {
+            double width = newWidth.doubleValue() * COLUMN_WIDTH_RATIO;
+            startColumn.setPrefWidth(width);
+            endColumn.setPrefWidth(width);
+            titleColumn.setPrefWidth(width);
+            seatsColumn.setPrefWidth(width);
+        });
+    }
+
+    private void setupButtonBindings() {
+        // Bind button disable properties to whether an item is selected
+        editShowing.disableProperty().bind(Bindings.isNull(showingsTable.getSelectionModel().selectedItemProperty()));
+        deleteShowing.disableProperty().bind(Bindings.isNull(showingsTable.getSelectionModel().selectedItemProperty()));
+    }
+
     // Populates the TableView with initial data
     private void populateTable() {
-        // Get the shared ObservableList from the MovieDatabase
-        movieList = movieDatabase.getMovies();
+        movieList = showingsService.getAllMovies();
 
         // Update seats column with "X/Y" format where X is remaining seats and Y is total seats
         seatsColumn.setCellValueFactory(movie -> {
             int totalSeats = movie.getValue().getSeats();
-            int soldSeats = salesDatabase.getSeatsSoldForMovie(movie.getValue());  // Assuming you have a method to get sold seats
+            int soldSeats = showingsService.getSeatsSoldForMovie(movie.getValue());
             String seatsLeft = movie.getValue().getRemainingSeats(soldSeats) + "/" + totalSeats;
             return new SimpleStringProperty(seatsLeft);
         });
@@ -113,57 +108,61 @@ public class ManageShowingsController extends BaseController {
         showingsTable.setItems(movieList);
     }
 
-
     // Add showing button
     @FXML
     public void addShowing(ActionEvent event) throws IOException {
-        // Pass the shared MovieDatabase, User, and null for Movie (new showing)
         MovieTheaterApplication.getSceneController().changeScene("SaveShowing", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
     }
 
     // Edit showing button
+    @FXML
     public void editShowing(ActionEvent event) {
-        // Get the selected movie from the TableView
-        Movie selectedMovie = showingsTable.getSelectionModel().getSelectedItem();
+        selectedMovie = getSelectedMovie("No movie selected for editing.");
 
-        // Check if a movie is selected
-        if (selectedMovie == null) {
-            System.out.println("No movie selected for editing.");
-            return;
-        }
+        if (selectedMovie == null) return;
 
-        // Open the SaveShowing.fxml scene
         try {
             MovieTheaterApplication.getSceneController().changeScene("SaveShowing", new Context(user, selectedMovie, MovieTheaterApplication.getInMemoryDatabase()));
         } catch (IOException e) {
-            System.out.println("Error opening SaveShowing.fxml: " + e.getMessage());
+            showError("Something went wrong while editing the movie.");
         }
+
     }
 
     public void deleteShowing(ActionEvent event) {
-        Movie selectedMovie = showingsTable.getSelectionModel().getSelectedItem();
+        selectedMovie = getSelectedMovie("No movie selected for deletion.");
 
-        if (selectedMovie == null) {
-            System.out.println("No movie selected for deletion.");
-            return;
-        }
+        if (selectedMovie == null) return;
 
-        // check if the movie has already sold tickets
-        if (salesDatabase.getSeatsSoldForMovie(selectedMovie) > 0) {
-            errorLabel.setText("Cannot delete a movie that has already sold tickets.");
+        if (showingsService.hasSoldTickets(selectedMovie)) {
+            showError("Cannot delete a movie that has already sold tickets.");
             return;
         }
 
         try {
-            // Remove the selected movie from the database
-            database.getMovieDatabase().removeMovie(selectedMovie);
-
-            // Refresh the TableView
-            populateTable();
-
-            System.out.println("Movie deleted successfully.");
+            showingsService.deleteMovie(selectedMovie);
+            movieList.remove(selectedMovie);
+            clearError();
         } catch (Exception e) {
-            System.out.println("Error deleting movie: " + e.getMessage());
+            showError("Something went wrong while deleting the movie");
         }
+
+    }
+
+    private Movie getSelectedMovie(String errorMessage) {
+        selectedMovie = showingsTable.getSelectionModel().getSelectedItem();
+        if (selectedMovie == null) {
+            showError(errorMessage);
+            return null;
+        }
+        return selectedMovie;
+    }
+
+    private void showError(String message) {
+        errorLabel.setText(message);
+    }
+
+    private void clearError() {
+        errorLabel.setText("");
     }
 }
