@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
 
-// movieShowing could be a better name
 public class Movie implements Serializable {
     private static final long serialVersionUID = 1L;
     private String id;

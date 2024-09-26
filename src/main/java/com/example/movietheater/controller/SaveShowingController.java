@@ -1,28 +1,25 @@
 package com.example.movietheater.controller;
 
 import com.example.movietheater.MovieTheaterApplication;
-import com.example.movietheater.database.MovieDatabase;
 import com.example.movietheater.model.Context;
 import com.example.movietheater.model.Movie;
 import com.example.movietheater.model.User;
+import com.example.movietheater.service.MovieService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.converter.LocalDateStringConverter;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
-public class SaveShowingController extends  BaseController {
-    private User user;
-    private Movie movie;
-    private MovieDatabase movieDatabase;
+public class SaveShowingController extends BaseController {
+
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     @FXML
     private Label heading;
@@ -46,81 +43,100 @@ public class SaveShowingController extends  BaseController {
     private Button saveShowing;
 
     @FXML
-    private Button cancelSaving;
-
-    private Boolean isEditing = false;
+    private Label errorLabel;
 
     @FXML
-    private AnchorPane navigationPane;  // Reference to the pane where Navigation.fxml is included
+    private AnchorPane navigationPane;
+
+    private Boolean isEditing = false;
+    private User user;
+    private Movie movie;
+    private MovieService movieService;
 
     @Override
     public void initialize(Object data) {
         Context context = (Context) data;
         this.user = context.getUser();
         this.movie = context.getMovie();
-        this.movieDatabase = context.getInMemoryDatabase().getMovieDatabase();
-
-        Platform.runLater(() -> title.requestFocus());
+        this.movieService = new MovieService(context.getInMemoryDatabase());
 
         loadNavigation(navigationPane, context);
 
+        Platform.runLater(() -> title.requestFocus());
+
+        // Disable the text input for the DatePicker
+        startDate.getEditor().setDisable(true);
+        endDate.getEditor().setDisable(true);
+
+
         if (movie != null) {
-            System.out.println("Is editing movie: " + movie);
             isEditing = true;
-            editMovie();
+            setupForEditing();
         } else {
-            createMovie();
+            setupForNewMovie();
         }
     }
 
-    private void editMovie() {
+    private void setupForEditing() {
         heading.setText("Editing a movie");
         saveShowing.setText("Edit movie");
         title.setText(movie.getTitle());
 
-        // Set LocalDate to DatePicker and LocalTime to time fields
         startDate.setValue(movie.getStartTime().toLocalDate());
         endDate.setValue(movie.getEndTime().toLocalDate());
-
-        startTime.setText(movie.formatDateTime(movie.getStartTime()).split(" ")[1]);
-        endTime.setText(movie.formatDateTime(movie.getEndTime()).split(" ")[1]);
+        startTime.setText(movie.getStartTime().toLocalTime().format(TIME_FORMATTER));
+        endTime.setText(movie.getEndTime().toLocalTime().format(TIME_FORMATTER));
     }
 
-    private void createMovie() {
+    private void setupForNewMovie() {
         heading.setText("Creating a new movie");
-        saveShowing.setText("Save showing");
+        saveShowing.setText("Save movie");
     }
 
     public void cancelSaving(ActionEvent event) throws IOException {
-        MovieTheaterApplication.getSceneController().changeScene("ManageShowings", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
+        navigateToManageShowings();
     }
 
     public void saveShowing(ActionEvent event) throws IOException {
-        Movie newMovie = readMovie();
+        try {
+            Movie newMovie = readMovieInputs();
+            if (newMovie == null) {
+                return;
+            }
 
-        // check if boolean isEditing is true
-        if (isEditing) {
-            movieDatabase.updateMovie(newMovie);
-        } else {
-            movieDatabase.addMovie(newMovie);
+            if (isEditing) {
+                movieService.updateMovie(newMovie);
+            } else {
+                movieService.addMovie(newMovie);
+            }
+            navigateToManageShowings();
+
+        } catch (DateTimeParseException e) {
+            showError("Invalid date or time format. Use 'HH:mm' for time.");
+        } catch (IllegalArgumentException e) {
+            showError("Something went wrong while saving the movie.");
         }
-
-        MovieTheaterApplication.getSceneController().changeScene("ManageShowings", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
     }
 
-    // Get the values from the form
-    private Movie readMovie() {
+    private Movie readMovieInputs() {
         String title = this.title.getText();
 
-        String startDate = this.startDate.getValue().toString();
-        String startTime = this.startTime.getText();
+        if (title.isEmpty()) {
+            showError("Title cannot be empty.");
+            return null;
+        }
 
-        LocalDateTime startDateTime = LocalDateTime.parse(startDate + "T" + startTime);
+        LocalDateTime startDateTime = parseDateTime(startDate.getValue(), startTime.getText());
+        LocalDateTime endDateTime = parseDateTime(endDate.getValue(), endTime.getText());
 
-        String endDate = this.endDate.getValue().toString();
-        String endTime = this.endTime.getText();
+        if (startDateTime == null || endDateTime == null) {
+            return null;  // Validation already handled inside parseDateTime
+        }
 
-        LocalDateTime endDateTime = LocalDateTime.parse(endDate + "T" + endTime);
+        if (startDateTime.isAfter(endDateTime)) {
+            showError("End time must be after start time.");
+            return null;
+        }
 
         if (isEditing) {
             movie.setTitle(title);
@@ -129,6 +145,34 @@ public class SaveShowingController extends  BaseController {
             return movie;
         }
 
-        return new Movie(title, startDateTime, endDateTime, 100);
+        return new Movie(title, startDateTime, endDateTime, 100); // Default seat number to 100
+    }
+
+    // Enhanced validation for date and time fields
+    private LocalDateTime parseDateTime(LocalDate date, String time) {
+        if (date == null) {
+            showError("Date must be selected.");
+            return null;
+        }
+
+        if (time.isEmpty()) {
+            showError("Time must be provided.");
+            return null;
+        }
+
+        try {
+            return LocalDateTime.parse(date.toString() + "T" + time);
+        } catch (DateTimeParseException e) {
+            showError("Invalid time format. Please use 'HH:mm'.");
+            return null;
+        }
+    }
+
+    private void navigateToManageShowings() throws IOException {
+        MovieTheaterApplication.getSceneController().changeScene("ManageShowings", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
+    }
+
+    private void showError(String message) {
+        errorLabel.setText(message);
     }
 }

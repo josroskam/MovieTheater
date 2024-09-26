@@ -3,6 +3,7 @@ package com.example.movietheater.controller;
 import com.example.movietheater.MovieTheaterApplication;
 import com.example.movietheater.database.SalesDatabase;
 import com.example.movietheater.model.*;
+import com.example.movietheater.service.SalesService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,6 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SeatSelectionController extends BaseController {
+
+    private static final String SELECTED_SEAT_COLOR = "lightgreen";
+    private static final String AVAILABLE_SEAT_COLOR = "grey";
+    private static final String SOLD_SEAT_COLOR = "red";
 
     @FXML
     private Label errorLabel;
@@ -34,18 +39,17 @@ public class SeatSelectionController extends BaseController {
     private TextField customerNameField;
 
     @FXML
-    private AnchorPane navigationPane;  // Reference to the pane where Navigation.fxml is included
+    private AnchorPane navigationPane;
 
     @FXML
     private Label movieTitleLabel;
 
-    private SalesDatabase salesDatabase;  // Reference to the sales database
+    private SalesService salesService;
+    private List<Seat> selectedSeats = new ArrayList<>();
+    private List<Seat> soldSeats = new ArrayList<>();
 
     private final int rows = 6;
     private final int cols = 12;
-
-    private List<Seat> selectedSeats = new ArrayList<>();  // Store selected seats
-    private List<Seat> soldSeats = new ArrayList<>();      // Store already sold seats
 
     private User user;
     private Movie movie;
@@ -53,121 +57,106 @@ public class SeatSelectionController extends BaseController {
     @Override
     public void initialize(Object data) {
         Context context = (Context) data;
-
         this.user = context.getUser();
         this.movie = context.getMovie();
-        this.salesDatabase = context.getInMemoryDatabase().getSalesDatabase();
+        this.salesService = new SalesService(context.getInMemoryDatabase());
+
+        movieTitleLabel.setText(movie.formatDateTime(movie.getStartTime()) + " " + movie.getTitle());
+        loadNavigation(navigationPane, context);
 
         retrieveSoldSeats();
         loadSeats();
-        loadNavigation(navigationPane, context);
-
-        movieTitleLabel.setText(movie.formatDateTime(movie.getStartTime()) + " " + movie.getTitle());
     }
 
-    // Method to retrieve sold seats for the current movie
     private void retrieveSoldSeats() {
-        List<Sales> salesList = salesDatabase.getSalesByMovie(movie);
-        for (Sales sale : salesList) {
-            soldSeats.addAll(sale.getSeats());  // Add all sold seats to the soldSeats list
-        }
+        List<Sales> sales = salesService.getSalesByMovie(movie);
+        sales.forEach(sale -> soldSeats.addAll(sale.getSeats()));
     }
 
-    // Method to dynamically load seats into the GridPane
     private void loadSeats() {
         for (int row = 0; row < rows; row++) {
-            // Add a label with the row number at the start of each row
-            Label rowLabel = new Label("Row " + (row + 1));
-            rowLabel.setStyle("-fx-padding: 10px; -fx-font-weight: bold;");
-            seatGridPane.add(rowLabel, 0, row);  // Add the label in the first column (index 0)
+            seatGridPane.add(createRowLabel(row), 0, row);
 
-            // Generate seat buttons for each column, starting from column 1
             for (int col = 0; col < cols; col++) {
-                final int currentRow = row;
-                final int currentCol = col;
-
-                // Create a button for each seat
-                Button seatButton = new Button(String.valueOf(currentCol + 1));  // Display numbers 1 to 12
-
-                // Set fixed size for the button
-                seatButton.setMinWidth(40);  // Minimum width
-                seatButton.setMinHeight(40);  // Minimum height
-                seatButton.setPrefWidth(40);  // Preferred width
-                seatButton.setPrefHeight(40);  // Preferred height
-                seatButton.setMaxWidth(40);  // Maximum width
-                seatButton.setMaxHeight(40);  // Maximum height
-
-                seatButton.setStyle("-fx-background-color: grey; -fx-padding: 10px;");
-
-                Seat seat = new Seat(currentRow, currentCol);
-
-                // Check if the seat is sold and mark it accordingly
-                if (soldSeats.contains(seat)) {
-                    seatButton.setStyle("-fx-background-color: red; -fx-padding: 10px;");
-                    seatButton.setDisable(true);  // Disable the button for sold seats
-                } else {
-                    seatButton.setOnAction(event -> handleSeatSelection(event, currentRow, currentCol));
-                }
-
-                // Add the button to the GridPane starting from column 1 (as column 0 is reserved for row labels)
-                seatGridPane.add(seatButton, currentCol + 1, currentRow);  // Column shifted by +1
+                Seat seat = new Seat(row, col);
+                Button seatButton = createSeatButton(seat);
+                seatGridPane.add(seatButton, col + 1, row);  // Column +1 to skip the row label
             }
         }
     }
 
-
-    // Handle seat selection and toggle selection
-    private void handleSeatSelection(ActionEvent event, int row, int col) {
-        Button selectedSeat = (Button) event.getSource();
-        Seat seat = new Seat(row, col);  // Create a seat object based on row and col
-
-        if (selectedSeat.getStyle().contains("lightgreen")) {
-            selectedSeat.setStyle("-fx-background-color: grey;");  // Deselect seat
-            selectedSeats.remove(seat);  // Remove seat from the selected seats list
-        } else {
-            selectedSeat.setStyle("-fx-background-color: lightgreen;");  // Select seat
-            selectedSeats.add(seat);  // Add seat to the selected seats list
-        }
-
-        // Update the number of selected seats
-        confirmSelectionBtn.setText("Sell " + selectedSeats.size() + " tickets");
-
-        // Update the label to show selected seats
-        updateSelectedSeatsLabel();
+    private Label createRowLabel(int row) {
+        Label rowLabel = new Label("Row " + (row + 1));
+        rowLabel.setStyle("-fx-padding: 10px; -fx-font-weight: bold;");
+        return rowLabel;
     }
 
-    // Method to update the label showing selected seats
+    private Button createSeatButton(Seat seat) {
+        Button seatButton = new Button(String.valueOf(seat.getColumn() + 1));  // Display numbers 1 to 12
+        setButtonStyle(seatButton, seat);
+
+        seatButton.setMinSize(40, 40);
+        seatButton.setPrefSize(40, 40);
+        seatButton.setMaxSize(40, 40);
+
+        if (!soldSeats.contains(seat)) {
+            seatButton.setOnAction(event -> toggleSeatSelection(seatButton, seat));
+        } else {
+            seatButton.setDisable(true);
+        }
+
+        return seatButton;
+    }
+
+    private void setButtonStyle(Button seatButton, Seat seat) {
+        if (soldSeats.contains(seat)) {
+            seatButton.setStyle("-fx-background-color: " + SOLD_SEAT_COLOR + ";");
+        } else {
+            seatButton.setStyle("-fx-background-color: " + AVAILABLE_SEAT_COLOR + ";");
+        }
+    }
+
+    private void toggleSeatSelection(Button seatButton, Seat seat) {
+        if (selectedSeats.contains(seat)) {
+            seatButton.setStyle("-fx-background-color: " + AVAILABLE_SEAT_COLOR + ";");
+            selectedSeats.remove(seat);
+        } else {
+            seatButton.setStyle("-fx-background-color: " + SELECTED_SEAT_COLOR + ";");
+            selectedSeats.add(seat);
+        }
+
+        updateSelectedSeatsLabel();
+        confirmSelectionBtn.setText("Sell " + selectedSeats.size() + " tickets");
+    }
+
     private void updateSelectedSeatsLabel() {
         StringBuilder seatsText = new StringBuilder();
-        for (Seat seat : selectedSeats) {
-            seatsText.append("Row ").append(seat.getRow() + 1).append(" / ").append(seat.getColumn() + 1).append("\n");
-        }
+        selectedSeats.forEach(seat -> seatsText.append("Row ").append(seat.getRow() + 1).append(" / ").append(seat.getColumn() + 1).append("\n"));
         selectedSeatsLabel.setText(seatsText.toString());
     }
 
-    // Method to confirm seat selection and create a sales object
     public void confirmSelection() throws IOException {
         if (selectedSeats.isEmpty()) {
-            errorLabel.setText("Please select at least one seat.");
+            showError("Please select at least one seat.");
             return;
         }
 
         if (customerNameField.getText().isEmpty()) {
-            errorLabel.setText("Please enter customer name.");
+            showError("Please enter customer name.");
             return;
         }
 
-        // Create a new Sales object based on selected seats
         Sales sales = new Sales(customerNameField.getText(), movie, LocalDateTime.now(), selectedSeats);
+        salesService.addSale(sales);
 
-        // Add the sale to the database
-        salesDatabase.addSale(sales);
-
-        // Return to ticket sales view
         MovieTheaterApplication.getSceneController().changeScene("TicketSales", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
     }
 
     public void cancelSelection(ActionEvent event) throws IOException {
         MovieTheaterApplication.getSceneController().changeScene("TicketSales", new Context(user, null, MovieTheaterApplication.getInMemoryDatabase()));
+    }
+
+    private void showError(String message) {
+        errorLabel.setText(message);
     }
 }

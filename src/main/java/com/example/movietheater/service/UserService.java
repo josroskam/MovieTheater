@@ -1,5 +1,4 @@
 package com.example.movietheater.service;
-
 import com.example.movietheater.database.InMemoryDatabase;
 import com.example.movietheater.model.User;
 

@@ -25,7 +25,7 @@ public class SceneController {
         // Check if the navigation bar exists and initialize it with the context
         NavigationController navController = (NavigationController) loader.getNamespace().get("navigationController");
         if (navController != null) {
-            navController.initData(data);
+            navController.initialize(data);
         }
 
         stage.setScene(new Scene(root));

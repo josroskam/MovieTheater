@@ -21,9 +21,9 @@ public abstract class BaseController {
 
             // Get the navigation controller and pass the context
             NavigationController navigationController = loader.getController();
-            navigationController.initData(context);
+            navigationController.initialize(context);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error loading navigation: " + e.getMessage());
         }
     }
 }

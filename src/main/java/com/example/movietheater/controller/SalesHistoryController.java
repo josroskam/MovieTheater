@@ -1,30 +1,25 @@
 package com.example.movietheater.controller;
-
-import com.example.movietheater.database.SalesDatabase;
 import com.example.movietheater.model.Context;
 import com.example.movietheater.model.Sales;
 import com.example.movietheater.model.User;
+import com.example.movietheater.service.SalesService;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-
-import java.time.LocalDateTime;
 
 public class SalesHistoryController extends BaseController {
 
     @FXML
-    private TableView<Sales> salesTableView;  // The TableView for displaying sales history
+    private TableView<Sales> salesTableView;
 
     @FXML
     private TableColumn<Sales, String> dateTimeColumn;
 
     @FXML
-    private TableColumn<Sales, Integer> ticketAmountColumn;
+    private TableColumn<Sales, String> ticketAmountColumn;
 
     @FXML
     private TableColumn<Sales, String> customerColumn;
@@ -32,51 +27,59 @@ public class SalesHistoryController extends BaseController {
     @FXML
     private TableColumn<Sales, String> showingColumn;
 
-    private SalesDatabase salesDatabase;
+    private SalesService salesService;
     private ObservableList<Sales> salesList;
     private User user;
 
     @FXML
-    private AnchorPane navigationPane;  // Reference to the pane where Navigation.fxml is included
+    private AnchorPane navigationPane;
 
     @Override
     public void initialize(Object data) {
         Context context = (Context) data;
-        this.salesDatabase = context.getInMemoryDatabase().getSalesDatabase();
+        this.salesService = new SalesService(context.getInMemoryDatabase());
         this.user = context.getUser();
 
         loadNavigation(navigationPane, context);
 
+        setupColumnWidths();
+        populateTable();
+    }
+
+    private void setupColumnWidths(){
         salesTableView.widthProperty().addListener((obs, oldWidth, newWidth) -> {
             dateTimeColumn.setPrefWidth(newWidth.doubleValue() * 0.20);
-            ticketAmountColumn.setPrefWidth(newWidth.doubleValue() * 0.20);
+            ticketAmountColumn.setPrefWidth(newWidth.doubleValue() * 0.15);
             customerColumn.setPrefWidth(newWidth.doubleValue() * 0.25);
-            showingColumn.setPrefWidth(newWidth.doubleValue() * 0.40);
+            showingColumn.setPrefWidth(newWidth.doubleValue() * 0.45);
         });
-        populateTable();
     }
 
     // Populates the TableView with initial data
     private void populateTable() {
-        // Fetch the sales data from the database
-        salesList = FXCollections.observableArrayList(salesDatabase.getAllSales());
+        salesList = salesService.getAllSales();
 
         // Bind the columns to the Sales properties
-        dateTimeColumn.setCellValueFactory(sales -> new SimpleStringProperty(sales.getValue().formatDateTime(sales.getValue().getDateTime())));
-        ticketAmountColumn.setCellValueFactory(new PropertyValueFactory<>("ticketAmount"));
-        customerColumn.setCellValueFactory(sales -> new SimpleStringProperty(sales.getValue().getUsername()));
-
-        // Use the movie's start time as the showing column including the movie title
-
-        showingColumn.setCellValueFactory(sales -> new SimpleStringProperty(sales.getValue().getMovie().getTitle() + " at " + sales.getValue().getMovie().formatDateTime(sales.getValue().getMovie().getStartTime())));
+        bindColumns();
 
         // Set the data to the TableView
         salesTableView.setItems(salesList);
+    }
 
-        // Optionally, print the sales for debugging purposes
-        for (Sales sales : salesList) {
-            System.out.println(sales);
-        }
+    // Method to bind TableColumn properties to Sales fields
+    private void bindColumns() {
+        dateTimeColumn.setCellValueFactory(sales ->
+                new SimpleStringProperty(sales.getValue().formatDateTime(sales.getValue().getDateTime())));
+
+        ticketAmountColumn.setCellValueFactory(sales ->
+                new SimpleStringProperty(String.valueOf(sales.getValue().getSeats().size())));
+
+        customerColumn.setCellValueFactory(sales ->
+                new SimpleStringProperty(sales.getValue().getUsername()));
+
+        showingColumn.setCellValueFactory(sales ->
+                new SimpleStringProperty(sales.getValue().getMovie().getTitle() + " at " +
+                        sales.getValue().getMovie().formatDateTime(sales.getValue().getMovie().getStartTime())));
     }
 }
 

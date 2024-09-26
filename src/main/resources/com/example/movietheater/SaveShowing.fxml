@@ -28,6 +28,7 @@
                </children></AnchorPane>
             <Button fx:id="saveShowing" layoutX="33.0" layoutY="281.0" mnemonicParsing="false" onAction="#saveShowing" text="Add / Save showing" />
             <Button fx:id="cancelSaving" layoutX="167.0" layoutY="281.0" mnemonicParsing="false" onAction="#cancelSaving" text="Cancel" />
+            <Label fx:id="errorLabel" layoutX="255.0" layoutY="285.0" />
             </children>
         </AnchorPane>
     </center>

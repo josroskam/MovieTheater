@@ -22,7 +22,6 @@ public class MovieTheaterApplication extends Application {
     private void saveDatabase() {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(DATA_FILE))) {
             out.writeObject(inMemoryDatabase);
-            System.out.println("Database state saved to file.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -44,7 +43,6 @@ public class MovieTheaterApplication extends Application {
     // Ensure to save the database when the application closes
     @Override
     public void stop() {
-        System.out.println("Application closing. Saving database state...");
         saveDatabase();
     }
 
@@ -66,11 +64,6 @@ public class MovieTheaterApplication extends Application {
 
     public static SceneController getSceneController() {
         return sceneController;
-    }
-
-    // Get the current instance of MovieTheaterApplication
-    public static MovieTheaterApplication getInstance() {
-        return instance;
     }
 
     public static void main(String[] args) {
