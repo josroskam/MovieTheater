@@ -53,6 +53,8 @@ public class SaveShowingController extends BaseController {
     private Movie movie;
     private MovieService movieService;
 
+    private final Integer TOTAL_SEATS = 72;
+
     @Override
     public void initialize(Object data) {
         Context context = (Context) data;
@@ -130,7 +132,7 @@ public class SaveShowingController extends BaseController {
         LocalDateTime endDateTime = parseDateTime(endDate.getValue(), endTime.getText());
 
         if (startDateTime == null || endDateTime == null) {
-            return null;  // Validation already handled inside parseDateTime
+            return null;
         }
 
         if (startDateTime.isAfter(endDateTime)) {
@@ -145,10 +147,10 @@ public class SaveShowingController extends BaseController {
             return movie;
         }
 
-        return new Movie(title, startDateTime, endDateTime, 100); // Default seat number to 100
+        return new Movie(title, startDateTime, endDateTime, TOTAL_SEATS); // Default seat number to 72
     }
 
-    // Enhanced validation for date and time fields
+    // Validation for date and time fields
     private LocalDateTime parseDateTime(LocalDate date, String time) {
         if (date == null) {
             showError("Date must be selected.");
