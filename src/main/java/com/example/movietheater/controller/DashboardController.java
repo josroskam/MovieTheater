@@ -1,15 +1,10 @@
 package com.example.movietheater.controller;
 
-import com.example.movietheater.MovieTheaterApplication;
 import com.example.movietheater.model.Context;
-import com.example.movietheater.model.Movie;
 import com.example.movietheater.model.User;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
-
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 

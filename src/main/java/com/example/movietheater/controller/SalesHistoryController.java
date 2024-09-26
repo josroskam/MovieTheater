@@ -29,7 +29,6 @@ public class SalesHistoryController extends BaseController {
 
     private SalesService salesService;
     private ObservableList<Sales> salesList;
-    private User user;
 
     @FXML
     private AnchorPane navigationPane;
@@ -38,7 +37,6 @@ public class SalesHistoryController extends BaseController {
     public void initialize(Object data) {
         Context context = (Context) data;
         this.salesService = new SalesService(context.getInMemoryDatabase());
-        this.user = context.getUser();
 
         loadNavigation(navigationPane, context);
 
@@ -62,7 +60,6 @@ public class SalesHistoryController extends BaseController {
         // Bind the columns to the Sales properties
         bindColumns();
 
-        // Set the data to the TableView
         salesTableView.setItems(salesList);
     }
 

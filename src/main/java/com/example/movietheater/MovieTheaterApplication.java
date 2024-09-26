@@ -32,7 +32,6 @@ public class MovieTheaterApplication extends Application {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(DATA_FILE))) {
             return (InMemoryDatabase) in.readObject();
         } catch (FileNotFoundException e) {
-            System.out.println("Serialized file not found. Starting with a fresh database.");
             return new InMemoryDatabase();  // Return a fresh database if file doesn't exist
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();

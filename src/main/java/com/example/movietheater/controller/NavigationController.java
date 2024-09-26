@@ -15,11 +15,9 @@ public class NavigationController {
     }
 
     private void navigateTo(String scene, Role requiredRole, ActionEvent event) throws IOException {
-//        if (context.getUser().getRole().equals(requiredRole)) {
+        if (context.getUser().getRole().equals(requiredRole)) {
             MovieTheaterApplication.getSceneController().changeScene(scene, context);
-//        } else {
-//            System.out.println("User does not have permission to access this page");
-//        }
+        }
     }
 
     // Navigation handlers

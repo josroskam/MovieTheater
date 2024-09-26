@@ -2,7 +2,6 @@ package com.example.movietheater.controller;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.AnchorPane;
-
 import java.io.IOException;
 
 public abstract class BaseController {
@@ -23,7 +22,6 @@ public abstract class BaseController {
             NavigationController navigationController = loader.getController();
             navigationController.initialize(context);
         } catch (IOException e) {
-            System.out.println("Error loading navigation: " + e.getMessage());
         }
     }
 }
